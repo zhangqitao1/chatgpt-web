@@ -209,7 +209,7 @@ Current date: ${currentDate}`;
     const responseP = new Promise(
       async (resolve, reject) => {
         var _a, _b;
-        const url = `${this._apiBaseUrl}/chat/completions?api-version=2023-05-15`;
+        const url = `${this._apiBaseUrl}/chat/completions?api-version=2023-03-15-preview`;
         const headers = {
           "Content-Type": "application/json",
 					"api-key": this._apiKey,
@@ -254,6 +254,7 @@ Current date: ${currentDate}`;
                       result.role = delta.role;
                     }
                     onProgress == null ? void 0 : onProgress(result);
+										this._upsertMessage(result);
                   }
                 } catch (err) {
                   console.warn("OpenAI stream SEE event unexpected error", err);
@@ -317,6 +318,7 @@ Current date: ${currentDate}`;
           abortController.abort();
         };
       }
+			await this._upsertMessage(result);
       return pTimeout(responseP, {
         milliseconds: timeoutMs,
         message: "OpenAI timed out waiting for response"
@@ -352,19 +354,17 @@ Current date: ${currentDate}`;
         name: opts.name
       }
     ]) : messages;
+
     let numTokens = 0;
     do {
       const prompt = nextMessages.reduce((prompt2, message) => {
         switch (message.role) {
           case "system":
-            return prompt2.concat([`Instructions:
-${message.content}`]);
+            return prompt2.concat([`Instructions:${message.content}`]);
           case "user":
-            return prompt2.concat([`${userLabel}:
-${message.content}`]);
+            return prompt2.concat([`${userLabel}:${message.content}`]);
           default:
-            return prompt2.concat([`${assistantLabel}:
-${message.content}`]);
+            return prompt2.concat([`${assistantLabel}:${message.content}`]);
         }
       }, []).join("\n\n");
       const nextNumTokensEstimate = await this._getTokenCount(prompt);
@@ -374,6 +374,11 @@ ${message.content}`]);
       }
       messages = nextMessages;
       numTokens = nextNumTokensEstimate;
+
+      if (numTokens > maxNumTokens){
+        break;
+      }
+
       if (!isValidPrompt) {
         break;
       }
