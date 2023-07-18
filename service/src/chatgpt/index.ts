@@ -38,19 +38,12 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
 (async () => {
   // More Info: https://github.com/transitive-bullshit/chatgpt-api
   if (isNotEmptyString(process.env.OPENAI_API_KEY)) {
+    global.console.log(process.env)
     const OPENAI_API_BASE_URL = process.env.OPENAI_API_BASE_URL
-    const KEYV_MYSQL_URI = process.env.KEYV_MYSQL_URI
-    const KEYV_MYSQL_TABLE = process.env.KEYV_MYSQL_TABLE
-    const messageStore = new Keyv(KEYV_MYSQL_URI, {
-      table: KEYV_MYSQL_TABLE,
-      keySize: 255,
-    })
-
     const options: ChatGPTAPIOptions = {
       apiKey: process.env.OPENAI_API_KEY,
       completionParams: { model },
       debug: !disableDebug,
-      messageStore,
     }
 
     // increase max token limit if use gpt-4
@@ -75,7 +68,17 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
     if (isNotEmptyString(OPENAI_API_BASE_URL))
       options.apiBaseUrl = `${OPENAI_API_BASE_URL}`
 
+    if (isNotEmptyString(process.env.KEYV_MYSQL_URI)) {
+      const KEYV_MYSQL_URI = process.env.KEYV_MYSQL_URI
+      const KEYV_MYSQL_TABLE = process.env.KEYV_MYSQL_TABLE
+      options.messageStore = new Keyv(KEYV_MYSQL_URI, {
+        table: KEYV_MYSQL_TABLE,
+        keySize: 255,
+      })
+    }
     setupProxy(options)
+
+    global.console.log(options)
 
     api = new ChatGPTAPI({ ...options })
     apiModel = 'ChatGPTAPI'
