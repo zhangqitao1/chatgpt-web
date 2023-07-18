@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv'
 import 'isomorphic-fetch'
-import type { ChatGPTAPIOptions, ChatMessage, SendMessageOptions } from 'chatgpt'
-import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from 'chatgpt'
+import type { ChatGPTAPIOptions, ChatMessage, SendMessageOptions } from 'chatgpt-api'
+import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from 'chatgpt-api'
 import Keyv from 'keyv'
 import { SocksProxyAgent } from 'socks-proxy-agent'
 import httpsProxyAgent from 'https-proxy-agent'
@@ -10,7 +10,6 @@ import { sendResponse } from '../utils'
 import { isNotEmptyString } from '../utils/is'
 import type { ApiModel, ChatContext, ChatGPTUnofficialProxyAPIOptions, ModelConfig } from '../types'
 import type { RequestOptions, SetProxyOptions, UsageResponse } from './types'
-import * as console from "console";
 
 const { HttpsProxyAgent } = httpsProxyAgent
 
@@ -74,9 +73,8 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
     }
 
     if (isNotEmptyString(OPENAI_API_BASE_URL))
-      options.apiBaseUrl = `${OPENAI_API_BASE_URL}/v1`
+      options.apiBaseUrl = `${OPENAI_API_BASE_URL}`
 
-    console.log(options)
     setupProxy(options)
 
     api = new ChatGPTAPI({ ...options })

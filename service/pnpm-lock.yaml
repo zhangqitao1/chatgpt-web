@@ -17,6 +17,9 @@ dependencies:
   chatgpt:
     specifier: ^5.1.2
     version: 5.1.2
+  chatgpt-api:
+    specifier: ./chatgpt-api
+    version: link:chatgpt-api
   dotenv:
     specifier: ^16.0.3
     version: 16.0.3
