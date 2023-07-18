@@ -10,6 +10,7 @@ import { sendResponse } from '../utils'
 import { isNotEmptyString } from '../utils/is'
 import type { ApiModel, ChatContext, ChatGPTUnofficialProxyAPIOptions, ModelConfig } from '../types'
 import type { RequestOptions, SetProxyOptions, UsageResponse } from './types'
+import * as console from "console";
 
 const { HttpsProxyAgent } = httpsProxyAgent
 
@@ -39,8 +40,10 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
   // More Info: https://github.com/transitive-bullshit/chatgpt-api
   if (isNotEmptyString(process.env.OPENAI_API_KEY)) {
     const OPENAI_API_BASE_URL = process.env.OPENAI_API_BASE_URL
-    const messageStore = new Keyv('mysql://root:123456@localhost:3306/chatgpt', {
-      table: 'cache',
+    const KEYV_MYSQL_URI = process.env.KEYV_MYSQL_URI
+    const KEYV_MYSQL_TABLE = process.env.KEYV_MYSQL_TABLE
+    const messageStore = new Keyv(KEYV_MYSQL_URI, {
+      table: KEYV_MYSQL_TABLE,
       keySize: 255,
     })
 
@@ -73,6 +76,7 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
     if (isNotEmptyString(OPENAI_API_BASE_URL))
       options.apiBaseUrl = `${OPENAI_API_BASE_URL}/v1`
 
+    console.log(options)
     setupProxy(options)
 
     api = new ChatGPTAPI({ ...options })
