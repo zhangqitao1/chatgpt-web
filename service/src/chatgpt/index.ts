@@ -76,6 +76,10 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
         keySize: 255,
       })
     }
+		else if (isNotEmptyString(process.env.KEYV_REDIS_URI)) {
+			options.messageStore = new Keyv(process.env.KEYV_REDIS_URI);
+		}
+
     setupProxy(options)
 
     global.console.log(options)
