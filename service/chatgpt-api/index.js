@@ -226,6 +226,7 @@ Current date: ${currentDate}`;
           console.log(`sendMessage (${numTokens} tokens)`, body);
         }
         if (stream) {
+					let messageCount = 0;
           fetchSSE(
             url,
             {
@@ -254,7 +255,11 @@ Current date: ${currentDate}`;
                       result.role = delta.role;
                     }
                     onProgress == null ? void 0 : onProgress(result);
-										this._upsertMessage(result);
+
+										messageCount++;
+										if (messageCount % 10 === 0) {
+											this._upsertMessage(result);
+										}
                   }
                 } catch (err) {
                   console.warn("OpenAI stream SEE event unexpected error", err);
